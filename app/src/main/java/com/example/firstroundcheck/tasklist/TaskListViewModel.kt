@@ -1,5 +1,6 @@
 package com.example.firstroundcheck.tasklist
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CancellationException
@@ -14,8 +15,10 @@ class TaskListViewModel(
 ) : ViewModel() {
     private val _taskListUiState = MutableStateFlow(TaskListUiState())
     val taskListUiState : StateFlow<TaskListUiState> = _taskListUiState.asStateFlow()
+    private var loadCount = 0
 
     init {
+        Log.d("TaskListViewModel", "ViewModel created: ${hashCode()}")
         loadTasks()
     }
 
@@ -24,6 +27,11 @@ class TaskListViewModel(
     }
 
     private fun loadTasks(){
+        loadCount++
+        Log.d(
+            "TaskListViewModel",
+            "loadTasks called, count=$loadCount, viewModel=${hashCode()}"
+        )
         viewModelScope.launch {
             _taskListUiState.update { currentState ->
                 currentState.copy(isLoading = true, tasks = emptyList(), errorMessage=null)
@@ -41,5 +49,10 @@ class TaskListViewModel(
                 }
             }
         }
+    }
+
+    override fun onCleared() {
+        Log.d("TaskListViewModel", "ViewModel cleared: ${hashCode()}")
+        super.onCleared()
     }
 }
